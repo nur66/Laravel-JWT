@@ -122,7 +122,14 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $article = Article::find($id);
+        $article->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "Article berhasil dihapus",
+            "data" => $article
+        ]);
     }
 
     public function showArticle()
