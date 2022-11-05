@@ -17,7 +17,8 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $article = Article::latest()->get();
+        // $article = Article::latest()->get();
+        $article = Article::latest()->paginate(2);
         return response()->json([
             "success" => true,
             "message" => "Article berhasil ditampilkan",
@@ -39,17 +40,17 @@ class ArticleController extends Controller
         ]);
 
         // validasi image
-        $this->validate($request, [
-            'image' => 'required | image | mimes:jpg,jpeg,png,svg | max:20000000'
-        ]);
+        // $this->validate($request, [
+        //     'image' => 'required | image | mimes:jpg,jpeg,png,svg | max:20000000'
+        // ]);
 
-        $foto = $request->file('image');
-        $foto_name = $foto->getClientOriginalName();
-        $store_foto = time().$foto_name;
-        $foto->move(('image'), $store_foto);
+        // $foto = $request->file('image');
+        // $foto_name = $foto->getClientOriginalName();
+        // $store_foto = time().$foto_name;
+        // $foto->move(('image'), $store_foto);
 
-        if($validator->fails()){
-            return response()->json($validator->message(), 422);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 422);
         }
 
         $user = auth()->user();
@@ -57,7 +58,7 @@ class ArticleController extends Controller
         $article = $user->articles()->create([
             'title' => $request->title,
             'body' => $request->body,
-            'image' => $request->image
+            // 'image' => $request->image
         ]);
 
         return response()->json([
@@ -97,27 +98,14 @@ class ArticleController extends Controller
             'body' => 'required'
         ]);
 
-        // validasi image
-        $this->validate($request, [
-            'image' => 'required | image | mimes:jpg,jpeg,png,svg | max:20000000'
-        ]);
-
-        $foto = $request->file('image');
-        $foto_name = $foto->getClientOriginalName();
-        $store_foto = time().$foto_name;
-        $foto->move(('image'), $store_foto);
-
-        if($validator->fails()){
-            return response()->json($validator->message(), 422);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 422);
         }
 
-        // $user = auth()->user();
-
-        $article = Article::where('id', $id)->update([
-            'title' => $request->title,
-            'body' => $request->body,
-            'image' => $request->image
-        ]);
+        $article = Article::find($id);
+        $article->title = $request->title;
+        $article->body = $request->body;
+        $article->save();
 
         return response()->json([
             "success" => true,
@@ -141,31 +129,31 @@ class ArticleController extends Controller
     {
         $result = [];
         $data = Article::get();
-        
+
         return $data;
     }
 
     public function storeArticle(Request $request)
     {
         // dd(123);
-        if(Auth::user()){
+        if (Auth::user()) {
             $this->validate($request, [
                 'image' => 'required | image | mimes:jpg,jpeg,png | max:20000000'
             ]);
-    
+
             $image = $request->file('image');
             $image_name = $image->getClientOriginalName();
-            $store_image = time().$image_name;
+            $store_image = time() . $image_name;
             $image->move('image', $store_image);
 
             // $user = auth()->user();
-    
+
             $article = Article::create([
                 'title' => $request->title,
                 'body' => $request->body,
                 'image' => $store_image
             ]);
-    
+
             // return response()->json(
             //     Response::HTTP_OK
             // );
@@ -174,11 +162,10 @@ class ArticleController extends Controller
                 "message" => "Article berhasil ditambahkan",
                 "data" => $article
             ]);
-        }else{
+        } else {
             return response()->json([
                 Response::HTTP_INTERNAL_SERVER_ERROR
             ]);
         }
-        
     }
 }
