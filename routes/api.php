@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,10 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
 
 });
 
-Route::post('tes', [AuthController::class, 'tes']);
+// Route::post('tes', [AuthController::class, 'tes']);
+
+Route::apiResource('articles', ArticleController::class);
+
+Route::get('show-article', [ArticleController::class, 'showArticle']);
+
+Route::post('store-article', [ArticleController::class, 'storeArticle']);
