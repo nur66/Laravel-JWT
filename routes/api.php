@@ -33,6 +33,9 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
 
 Route::apiResource('articles', ArticleController::class);
 
+// jika menggunakan middleware
+Route::get('/get-article', [ArticleController::class, 'index'])->middleware('auth:api');
+
 Route::get('show-article', [ArticleController::class, 'showArticle']);
 
 Route::post('store-article', [ArticleController::class, 'storeArticle']);
